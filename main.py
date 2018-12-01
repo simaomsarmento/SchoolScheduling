@@ -45,6 +45,7 @@ class Problem(csp.CSP):
         # 1. Get time slots
         time_slots = info[0].rstrip().split(' ')[1:]
         T = [(slot.split(',')[0], slot.split(',')[1])  for slot in time_slots]
+        T = sorted(T, key=lambda tup: tup[1]) # sort by hour so that earlier classes are evaluated first
         # 2. Get rooms
         R = info[1].rstrip().split(' ')[1:]
         # 3. Get classes
