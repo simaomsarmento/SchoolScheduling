@@ -7,10 +7,6 @@ class Problem(csp.CSP):
         # Place here your code to load problem from opened file object fh and
         # set variables, domains, graph, and constraint_function accordingly
         T, R, S, W, A = self.load_information(fh)
-
-        # defining auxilary dictionary for dates
-        dates = {'Mon':1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5}
-
         # Setting variables
         variables = W
         # Setting domains
@@ -25,6 +21,7 @@ class Problem(csp.CSP):
 
         super().__init__(variables, domains, graph, self.constraints_function)
         self.A = A # adds information about course/class association
+        self.day = {'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5}  # defining auxiliary dictionary for dates
 
     def load_information(self, fh):
         """
@@ -67,6 +64,7 @@ class Problem(csp.CSP):
         1- if two courses are at the same time, the rooms must be different
         2- the same class cannot have two course at the same time
         3- the same course cannot have two of ocurrences of the same kind on the same day
+        4- for the same course, the lower index must come before the greater index
 
         :param: A - (c,k,i) - c: course, k: kind, i: index
                 a - (t, r) - t: time, r: room
@@ -83,12 +81,14 @@ class Problem(csp.CSP):
             if self.verify_class_colision(A[0], B[0]):
                 return False
 
-        # Verify 3rd constraint
         if (A[0] == B[0]) and (A[1] == B[1]): # same course and same kind
+            # Verify 3rd constraint
             if a[0][0] == b[0][0]: # a[0] represents (d,t) tuple. a[0][0] represents the day d
                 return False
-            # Verifies correct order in courses
-            # TODO
+            # # Verify 4th constraint
+            if ((A[2] > B[2]) and (self.day[a[0][0]]<self.day[b[0][0]])) or \
+               ((A[2] < B[2]) and (self.day[a[0][0]]>self.day[b[0][0]])):
+                return False
         return True
 
     def verify_class_colision(self, course1, course2):
@@ -126,4 +126,7 @@ def solve(input_file, output_file):
     p = Problem(input_file)
     # Place here your code that calls function csp.backtracking_search(self, ...)
     solution = csp.backtracking_search(p, select_unassigned_variable=csp.mrv, inference=csp.forward_checking)
-    p.dump_solution(output_file, solution)
+    if solution is None:
+        output_file.write('None')
+    else:
+        p.dump_solution(output_file, solution)

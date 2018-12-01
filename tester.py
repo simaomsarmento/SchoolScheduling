@@ -1,9 +1,9 @@
 import main
 
-example = 'Examples/example1.txt'
+example = 'Examples/example1_infeasible.txt'
 
 input_file = open(example, 'r')
-output_file = open('Examples/example1_output.txt', 'w')
+output_file = open('Examples/example1_infeasible_output.txt', 'w')
 
 try:
     # do stuff with f
