@@ -3,7 +3,13 @@ from itertools import product
 
 class Problem(csp.CSP):
 
-    def __init__(self, fh):
+    def __init__(self, fh, optimization):
+        """
+
+        :param fh: open file
+        :param optimization_mode: -1 if csp is not being optimized
+                                  cost to beat otherwise
+        """
         # Place here your code to load problem from opened file object fh and
         # set variables, domains, graph, and constraint_function accordingly
         T, R, S, W, A = self.load_information(fh)
@@ -19,9 +25,12 @@ class Problem(csp.CSP):
         for variable in variables:
             graph[variable] = [variable_aux for variable_aux in variables if variable_aux != variable]
 
+        # Intialize parameters
         super().__init__(variables, domains, graph, self.constraints_function)
+        self.optimization = optimization
         self.A = A # adds information about course/class association
         self.day = {'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5}  # defining auxiliary dictionary for dates
+
 
     def load_information(self, fh):
         """
@@ -38,6 +47,7 @@ class Problem(csp.CSP):
 
         # verify file validity
         if len(info) == 5:
+            fh.seek(0) # return pointer to the start of file
             pass
         else:
             exit('WRONG NUMBER OF LINES _ FILE MUST HAVE 5 LINES')
@@ -61,7 +71,7 @@ class Problem(csp.CSP):
 
     def constraints_function(self, A, a, B, b):
         """
-        We must verify 3 conditions:
+        We must verify 4 conditions:
         1- if two courses are at the same time, the rooms must be different
         2- the same class cannot have two course at the same time
         3- the same course cannot have two of ocurrences of the same kind on the same day
@@ -73,6 +83,12 @@ class Problem(csp.CSP):
                 b - (t, r) - t: time, r: room
         :return: True or False
         """
+
+        # If csp is being run with optimization purpose, then no class should start later
+        # than the imposed cost limit
+        if self.optimization != -1:
+            if int(a[0][1]) > self.optimization or int(b[0][1]) > self.optimization:
+                return False
 
         if a[0] == b[0]: # same time slot
             # Verify 1st constraint
@@ -90,6 +106,7 @@ class Problem(csp.CSP):
             if ((A[2] > B[2]) and (self.day[a[0][0]]<self.day[b[0][0]])) or \
                ((A[2] < B[2]) and (self.day[a[0][0]]>self.day[b[0][0]])):
                 return False
+
         return True
 
     def verify_class_colision(self, course1, course2):
@@ -116,7 +133,11 @@ class Problem(csp.CSP):
         return False
 
     def dump_solution(self, fh, solution):
-        # Place here your code to write solution to opened file object fh
+        """
+        Function to write the output of the solution found
+        :param fh: file in which to write the solution
+        :param solution: solution to write
+        """
         for variable in self.variables:
             str_solution = variable[0]+','+variable[1]+','+variable[2]+' '+solution[variable][0][0]+','\
                            +solution[variable][0][1]+' '+solution[variable][1]+'\n'
@@ -124,10 +145,65 @@ class Problem(csp.CSP):
 
         
 def solve(input_file, output_file):
-    p = Problem(input_file)
-    # Place here your code that calls function csp.backtracking_search(self, ...)
+    """
+    Function to solve a csp problem
+    :param input_file: open file with information about csp
+    :param output_file: open file, where the solution must be written
+    """
+    p = Problem(input_file, optimization=-1)
+    # Call backtrack, to test problem feasibility
     solution = csp.backtracking_search(p, select_unassigned_variable=csp.mrv, inference=csp.forward_checking)
     if solution is None:
         output_file.write('None')
     else:
-        p.dump_solution(output_file, solution)
+        #print(solution)
+        #print(solution_cost(solution))
+        optimized_solution = optimized_csp(p, input_file, solution)
+        #print(optimized_solution)
+        #print(solution_cost(optimized_solution))
+        p.dump_solution(output_file, optimized_solution)
+
+def optimized_csp(p, input_file, solution):
+    """
+    This function tries to optimize a feasible csp. The cost corresponds to the latest class
+    over all weekdays. The logic works as follows:
+    1. Get best solution obtained so far
+    2. Call backtrack and impose as a constraint that all classes should start earlier
+       than the current solution (latest class)
+    3. If new solution is obtained, back to 1. If problem turned unfeasible, return previous
+       solution
+
+    :param p: inherited csp class with customized functions
+    :param input_file: file with info
+    :param solution: best solution so far
+    :return: best possible solution
+    """
+    # best solution so far, with no optimization yet
+    best_solution = solution
+    best_cost= solution_cost(solution)
+
+    while 1:
+        limit = best_cost - 1
+        p = Problem(input_file, optimization=limit)
+        solution = csp.backtracking_search(p, select_unassigned_variable=csp.mrv, inference=csp.forward_checking)
+        if solution is None:
+            return best_solution
+
+        # update optimization
+        best_solution = solution
+        best_cost = solution_cost(solution)
+
+
+def solution_cost(solution):
+    """
+    Function to retrieve cost of one solution
+
+    :param solution: obtained solution from csp
+    :return: cost
+    """
+    cost = 0
+    for assignment in solution.values():
+        if int(assignment[0][1])>cost: # class hour
+            cost = int(assignment[0][1])
+
+    return cost
