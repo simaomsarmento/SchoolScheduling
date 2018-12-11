@@ -186,7 +186,7 @@ def optimized_csp(p, input_file, solution):
     while 1:
         limit = best_cost - 1
         p = Problem(input_file, optimization=limit)
-        solution = csp.backtracking_search(p, select_unassigned_variable=csp.mrv, inference=csp.forward_checking)
+        solution = csp.backtracking_search(p, select_unassigned_variable=csp.mrv, inference=csp.mac)
         if solution is None:
             return best_solution
 
