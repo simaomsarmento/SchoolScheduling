@@ -1,0 +1,19 @@
+heuristic- mrv
+inference- forward checking + forward checking(optimization)
+variables_order- No
+TIME: 3.526250 + 0.364220 + 0.003026
+-------------------------------------
+heuristic- mrv
+inference- forward checking + forward checking(optimization)
+variables_order - sorted by time
+TIME: 3.304403 + 0.367582 + 0.002286
+-------------------------------------
+heuristic- mrv
+inference- mac + forward checking(optimization)
+variables_order - sorted by time
+TIME: 3.246162+0.340477 +0.003413
+-------------------------------------
+heuristic- mrv
+inference- mac + mac(optimization)
+variables_order - sorted by time
+TIME: 3.538360+0.324825+0.003939

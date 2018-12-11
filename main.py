@@ -152,7 +152,8 @@ def solve(input_file, output_file):
     """
     p = Problem(input_file, optimization=-1)
     # Call backtrack, to test problem feasibility
-    solution = csp.backtracking_search(p, select_unassigned_variable=csp.mrv, inference=csp.forward_checking)
+    solution = csp.backtracking_search(p, select_unassigned_variable=csp.mrv,
+                                       inference=csp.mac)
     if solution is None:
         output_file.write('None')
     else:
