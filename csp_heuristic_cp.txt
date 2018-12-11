@@ -2,14 +2,12 @@ Heuristic:
 
 Here we will describe two types of heuristics used in different steps. The first one is related with the way we organize our data before solving the CSP itself. The second heuristic is related with the actual CSP resolution.
 
-1 - sorting: After reading the input file, we sort the time slots by time in the day, and only after sorting we proceed to solve the CSP. This initial sort saves up time, as earlier time slots will be assigned first, and a lower cost solution is more likely to be assigned. Therefore, the optimisation process is more likely to start from a closer to optimal solution, which will reduce the number of iterations necessary to get the optimal solution.
+1 - sorting: After reading the input file, we sort the time slots by time in the day, and only after sorting we proceed to solve the CSP. This initial sort saves up time, as earlier time slots will be assigned first, and a lower cost solution is more likely to be assigned. Therefore, the optimisation process is more likely to start from a closer to optimal solution, which will reduce the number of iterations necessary to get the optimal solution. Note that to make use of this, the variable order_domain_values should be set to unordered_domain_values (which is the default)
 
 2 - 
 
-As a first heuristic, we read the input and immediately sort the 
 
 
 
 Constraint propagation:
-For inference, we chose to use forward checking. 
-(podemos dizer que como o problema é pequeno, forward checking acaba por ser mais rápido que usar MAC?)
+For inference, we chose to use mac. O tempo não muda e assim sempre fazemos menos assignements errados I guess..
