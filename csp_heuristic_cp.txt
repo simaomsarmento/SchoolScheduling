@@ -1,13 +1,13 @@
-Heuristic:
+Indicate which heuristics and constraint propagation (inference) methods were used, and justify your choice.
 
+Heuristic:
 Here we will describe two types of heuristics used in different steps. The first one is related with the way we organize our data before solving the CSP itself. The second heuristic is related with the actual CSP resolution.
 
-1 - sorting: After reading the input file, we sort the time slots by time in the day, and only after sorting we proceed to solve the CSP. This initial sort saves up time, as earlier time slots will be assigned first, and a lower cost solution is more likely to be assigned. Therefore, the optimisation process is more likely to start from a closer to optimal solution, which will reduce the number of iterations necessary to get the optimal solution. Note that to make use of this, the variable order_domain_values should be set to unordered_domain_values (which is the default)
+1 - sorting: After reading the input file, we sort the time slots by time in the day, and only after sorting we proceed to solve the CSP. This initial sort saves up time, as earlier time slots will be assigned first during search (at the top levels), and a lower cost solution, using the earlier classes, is more likely to be found. Therefore, the optimization process is more likely to start from a closer to optimal solution, which will reduce the number of iterations necessary to get the optimal solution. Note that to make use of this, the variable order_domain_values should be set to unordered_domain_values (which is the default)
 
-2 - 
-
-
+2 - mrv for variable ordering: we used minimum remaining value heuristic when solving the CSP problem, namely when selecting the next unassigned variable to analyze (assign a value and check constraints). This heuristic chooses the variable with fewest valid values to be assigned first, in order to detect inevitable failure as soon as possible. This way, branching is minimized and therefore the optimal solution will likely be found in the minimum time possible. The other option found in csp.py was to use first_unassigned_variable, which is the default variable order, and simply selects the first variable from the list of variables not yet assigned. This method doesn't take anything into account, therefore it's possible that the choosing order for the variables leads to an exaustive search. It was verified that this option took more time, therefore supporting the decision to use mrv heuristic instead.
 
 
 Constraint propagation:
-For inference, we chose to use mac. O tempo não muda e assim sempre fazemos menos assignements errados I guess..
+For inference, we tried mac and forward checking. Mac propagates the constraints throughout the entire graph, providing a greater chance of pruning branches of the tree when compared to forward checking, which only performs arc consistency for the variable that was just assigned (with its neighbors). The advantage of forward checking is that it performs less computations after each variable assignment. 
+The choice between heuristics is therefore problem dependent. In our problem, both solutions showed similar performance, given the small dimension of the problem. However, since the graph is fully connected (all variables are neighbors of all variables), the complexity of employing arc consistency could increase with the number of variables. For this reason we chose forward checking.

@@ -2,10 +2,15 @@ To completely define the CSP problem the following must be specified:
 
 - Variables: Our variables are the weekly courses, for which a time slot and a room must be assigned. Our variables are represented by a tuple (c, k, i), where c is the course, k is the kind of class and i the index for that same course and kind on that week.
 
-- Domains: Initially, the domain for each variable is composed by all the possible time slots and room combinations. The available time slots and rooms are received as an input of the program.
+- Domains: Initially, the domain for each variable is composed by all the possible time slots and room combinations, that is TxR. The available time slots and rooms are received as an input of the program.
 
 - Constraints: As for the constraints, we must verify 4 conditions: 
-	1- if two courses are at the same time, the rooms must be different
-        2- the same class cannot have two courses at the same time
-        3- the same course cannot have two of ocurrences of the same kind on the same day
+	1- if two classes are at the same time, the rooms must be different
+        2- the same student class cannot have two classes at the same time
+        3- the same course cannot have two ocurrences of the same kind on the same day
         4- for the same course, the lower index must come earlier in the week the greater index
+
+Note for clarity:
+- Class: a theoretical or problems lecture
+- Student Class: a group of students that attends the same lectures
+- Course: a subject of study
